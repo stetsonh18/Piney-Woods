@@ -22,7 +22,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-19-piney-woods-design.md` (sections 2, 3, 10, 11, 12 and 13 are the ones this plan implements)
 
-**Where this runs:** on the developer's Windows PC, with Claude Code running locally in the repo and the Unreal editor open. It can't run in a cloud container.
+**Where this runs:** on the developer's Windows PC, with Claude Code running locally in the repo and the Unreal editor open. It can't run in a cloud container. First-time PC setup, including the Visual Studio 2022 install that C++ needs: `docs/SETUP-PC.md`.
 
 ## Global Constraints
 
@@ -141,7 +141,7 @@ All paths are relative to `PineyWoods/Source/PineyWoods/`. Each file has one job
 - Produces: a buildable `PineyWoodsEditor` target; the `PineyWoods.` test namespace; an MCP connection for later tasks.
 
 - [ ] **Step 1: Create the project.** In the Epic Launcher, create Games → Third Person → **C++**, without Starter Content, at `<repo>\PineyWoods`, named `PineyWoods`. Open it once, then close it.
-- [ ] **Step 2: Set up git ignore and LFS.**
+- [x] **Step 2: Set up git ignore and LFS.** (Done in the repo already; just run `git lfs install` once on the dev PC.)
   - Add `.gitattributes` at the repo root, with `*.uasset filter=lfs diff=lfs merge=lfs -text` and the same line for `*.umap`.
   - Add `PineyWoods/.gitignore` with `Binaries/`, `Intermediate/`, `Saved/`, `DerivedDataCache/`, `.vs/`, `*.sln`.
   - Run `git lfs install`.

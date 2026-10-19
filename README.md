@@ -1,5 +1,7 @@
 # Piney Woods: Timber Wars
 
+> **The real game is being built in Unreal Engine 5.** Start with [`docs/SETUP-PC.md`](docs/SETUP-PC.md), the [design spec](docs/superpowers/specs/2026-10-19-piney-woods-design.md) and the [build plan](docs/superpowers/plans/2026-10-19-piney-woods-m0-m1-greybox-slice.md). Everything below describes the original browser prototype.
+
 A browser game that mixes three genres:
 - **Hero shooter** like Overwatch: five heroes, each with abilities and an ultimate.
 - **Battle royale** like Warzone: drop in from the sky, then a storm circle closes in.
