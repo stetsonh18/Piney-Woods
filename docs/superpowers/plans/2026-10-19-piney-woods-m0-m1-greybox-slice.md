@@ -173,7 +173,7 @@ git commit -m "chore: create PineyWoods UE5 project with GAS, MCP and smoke test
     - `bool OnDeath()`: returns whether the dead player may respawn
     - `bool AwardCapture(FName ZoneId, int32 Amount)`
     - `static bool IsWiped(int32 AliveConnectedPlayers, int32 Tickets, bool bConquest)`
-  - `UPWConquestRules : UPrimaryDataAsset`, with UPROPERTYs `FortifySeconds=600`, `StartTickets=15`, `TicketsPerCapture=3`, `RespawnHomeSeconds=8`, `RespawnZoneSeconds=12`, `CaptureRadiusCm=1200`, `BotCount=3`, `FPWCaptureTuning Capture`, `FPWChargeTuning Charge` (both structs are defined in Tasks 3 and 4; declare them in those tasks' headers, which this file includes)
+  - `UPWConquestRules : UPrimaryDataAsset`, with UPROPERTYs `FortifySeconds=600`, `StartTickets=15`, `TicketsPerCapture=3`, `RespawnHomeSeconds=8`, `RespawnZoneSeconds=12`, `CaptureRadiusCm=1200`, `BotCount=3`. (Task 3 adds `FPWCaptureTuning Capture` and Task 4 adds `FPWChargeTuning Charge` to this class.)
   - `PWTest::Advance(TFunctionRef<void(float)> Tick, float Seconds, float Step = 0.1f)`
 
 - [ ] **Step 1: Write the failing tests** in `PWTicketPoolTest.cpp`:
@@ -204,6 +204,7 @@ git commit -m "feat: add team types, conquest rules asset and ticket pool"
 
 **Files:**
 - Create: `Public/Objectives/PWCaptureLogic.h`, `Private/Objectives/PWCaptureLogic.cpp`
+- Modify: `Public/Core/PWConquestRules.h` (add `UPROPERTY(EditAnywhere) FPWCaptureTuning Capture;`)
 - Test: `Private/Tests/PWCaptureLogicTest.cpp`
 
 **Interfaces:**
@@ -247,6 +248,7 @@ git commit -m "feat: add capture zone logic with drain, contest and dead-pawn ru
 
 **Files:**
 - Create: `Public/Objectives/PWChargeLogic.h`, `Private/Objectives/PWChargeLogic.cpp`
+- Modify: `Public/Core/PWConquestRules.h` (add `UPROPERTY(EditAnywhere) FPWChargeTuning Charge;`)
 - Test: `Private/Tests/PWChargeLogicTest.cpp`
 
 **Interfaces:**
@@ -475,7 +477,7 @@ git commit -m "feat: add Ranger Dash, Frag Grenade and Hog Wild abilities"
 - [ ] **Step 4: Verify.** Run the tests, then do a PIE check with 2 players (Net Mode: Play As Listen Server). Set `FortifySeconds` to 30 in `DA_ConquestRules` for this check only, and don't commit that change. Expected:
   - Both tests pass.
   - Both players spawn at the south starts.
-  - Killing a player during the first 30 s doesn't change the ticket count. After 30 s, each death drops `SquadTickets` by 1 on both screens (shown with the `stat`-free debug print `PW.ShowState`, a console command you add to the game mode).
+  - Killing a player during the first 30 s doesn't change the ticket count. After 30 s, each death drops `SquadTickets` by 1 on both screens (shown by `PW.ShowState`, a debug console command you add to the game mode).
   - Respawn happens after 8 s.
 - [ ] **Step 5: Commit.**
 
@@ -504,7 +506,7 @@ git commit -m "feat: add conquest match flow, team spawning, respawns and greybo
   - `APWHQCore : AActor` with:
     - `UPROPERTY(EditAnywhere) EPWTeam Team`
     - A plant point at the core's location
-    - `void Destroy Core()`, which calls `OnHQDestroyed(Team)` and plays a placeholder explosion
+    - `void DestroyCore()`, which calls `OnHQDestroyed(Team)` and plays a placeholder explosion
   - `APWDemolitionCharge : AActor` with:
     - `UPROPERTY(EditAnywhere) EPWTeam OwnerTeam`, `APWHQCore* TargetHQ`
     - Replicated `EPWChargeState State`, `float ArmRemaining`, `float ActionProgress`
@@ -564,7 +566,7 @@ git commit -m "feat: add capture zone, HQ core and demolition charge actors"
 - [ ] **Step 1: Write the failing tests:**
   - `PineyWoods.AI.Brain.VisibleEnemyWins`: `bHasVisibleEnemy` together with `bHQThreatened` → AttackTarget.
   - `PineyWoods.AI.Brain.HQThreatBeatsZones` → DefendHQ.
-  - `PineyWoods.AI.Brain.CapturesNearestUnowned`: zones A (Squad-owned, 5000 cm) and B (None, 8000 cm), plus a third zone Enemy-owned at 1000 cm. The bot chooses `{CaptureZone, A}`. (A is nearer than B, and the third zone is already owned by the bot's own team.)
+  - `PineyWoods.AI.Brain.CapturesNearestUnowned`: `MyTeam = Enemy`, with zones A (Squad-owned, 5000 cm) and B (None, 8000 cm), plus a third zone Enemy-owned at 1000 cm. The bot chooses `{CaptureZone, A}`. (A is nearer than B, and the third zone is already owned by the bot's own team.)
   - `PineyWoods.AI.Brain.AllOwnedSplitsDuties`: all zones Enemy-owned. Index 0 → DefendHQ; index 1 → DefendZone with the nearest zone.
 - [ ] **Step 2: Run them to see them fail.** Filter `PineyWoods.AI.Brain`. Expected: FAIL.
 - [ ] **Step 3: Implement** the brain, the controller, `BT_Bot`/`BB_Bot` (via MCP) and bot spawning.
