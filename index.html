@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Piney Woods: Timber Wars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Oswald:wght@400;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="hud" class="hidden">
+      <div id="teams"></div>
+      <div id="stormInfo"></div>
+      <canvas id="minimap" width="200" height="200"></canvas>
+      <div id="killfeed"></div>
+      <div id="labels"></div>
+      <div id="scope"></div>
+      <div id="crosshair"><i></i><i></i><i></i><i></i><b></b></div>
+      <div id="hitmarker"></div>
+      <div id="bigToast"></div>
+      <div id="toast"></div>
+      <div id="prompt"></div>
+      <div id="vitals">
+        <div id="heroName"></div>
+        <div class="bar"><div id="hpFill"></div><div id="shieldFill"></div><span id="hpText"></span></div>
+      </div>
+      <div id="abilities"></div>
+      <div id="ammo"></div>
+      <div id="resources"></div>
+      <div id="buildPanel" class="hidden"></div>
+      <div id="stormVignette"></div>
+      <div id="damageVignette"></div>
+      <div id="deathScreen" class="hidden"></div>
+    </div>
+
+    <div id="menu" class="overlay">
+      <div class="menuInner">
+        <h1>PINEY WOODS <span>Timber Wars</span></h1>
+        <p class="tag">Hero shooter × battle royale × base building. Drop into the East Texas pines with a starter base, chop lumber, raid the other squads, and be the last base standing. No grind — every hero and every build is unlocked. The only thing you earn is the win.</p>
+        <h3>Pick your hero</h3>
+        <div id="heroCards"></div>
+        <div id="heroDetail"></div>
+        <h3>Difficulty</h3>
+        <div id="diffBtns"></div>
+        <button id="startBtn">DROP IN</button>
+        <div class="controls">
+          <span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>LMB</kbd> fire</span><span><kbd>RMB</kbd> aim down sights</span>
+          <span><kbd>Space</kbd> jump</span><span><kbd>R</kbd> reload</span><span><kbd>Shift</kbd> / <kbd>E</kbd> abilities</span><span><kbd>Q</kbd> ultimate</span>
+          <span><kbd>F</kbd> chop / open crate / melee</span><span><kbd>B</kbd> build mode</span><span><kbd>Esc</kbd> pause</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="pause" class="overlay hidden"><div class="pauseInner"><h2>PAUSED</h2><p>Click to jump back in</p></div></div>
+    <div id="endScreen" class="overlay hidden"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
