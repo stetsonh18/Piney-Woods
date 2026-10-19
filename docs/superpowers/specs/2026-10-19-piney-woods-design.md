@@ -1,7 +1,7 @@
 # Piney Woods: Timber Wars: Design Spec
 
 **Date:** 2026-10-19
-**Status:** Draft for squad review
+**Status:** Approved (revised 2026-10-19: stylized art and low-end PC support)
 **Pitch doc:** [Piney Woods: Timber Wars — Game Pitch](https://claude.ai/code/artifact/b57a4241-f9ea-4886-a58b-61fc7ca6a54c)
 
 All numbers in this spec are starting values for playtesting, not final balance. Tuning values live in data assets (see §11) so they can change without code changes.
@@ -25,6 +25,7 @@ There is no grind: progression only adds options, never power.
 2. **Build and fight at the same time.** Some of the squad fortifies while the rest pushes. Neither job is busywork.
 3. **East Texas through and through.** Pines, red clay, lakes, Hometown Heroes in overalls, coolers of energy drinks. Funny, but the game itself is played straight.
 4. **Squad decisions.** Big choices are made together by vote; no one player runs the show.
+5. **Runs on almost any Windows PC.** A stylized art style plus two graphics tiers (Fortnite's approach) means a cheap laptop and a gaming rig can play in the same squad.
 
 ---
 
@@ -295,7 +296,12 @@ Wildcard rules don't change hero power.
 | --- | --- |
 | Platform | Windows 10/11 PC; mouse and keyboard plus gamepad (PS5 DualSense via Steam Input / SDL) |
 | Engine | Unreal Engine 5 (the current release when the project is created; we stay on it until a deliberate upgrade) |
-| Performance target | 60 fps at 1080p, High settings, on an RTX 2070-class GPU. Scalability settings (Low to Epic) for weaker PCs. |
+| Art direction | Stylized, in the spirit of Overwatch and Fortnite: chunky pines, saturated East Texas sunsets, readable silhouettes, cartoony Hometown Heroes. No photoreal scanned assets. |
+| Minimum PC (Performance mode) | Windows 10 64-bit, 4-core CPU, 8 GB RAM, DirectX 11 GPU (GTX 960-class, Intel Iris Xe, AMD Radeon Vega). Target: 30+ fps at 1080p output with 50–67% resolution scale. |
+| Recommended PC (Epic mode) | RTX 3060-class GPU, 16 GB RAM. Target: 60 fps at 1080p with Lumen lighting. |
+| Graphics tiers | **Performance mode:** no Lumen (simple sky and ambient lighting), no Nanite-only assets, low shadows, upscaling on; runs on DX11. **Epic mode:** Lumen global illumination and reflections, high shadows; DX12. The game auto-detects a tier on first launch and players can change it. Every asset must look right in both tiers. |
+| Mixed squads | Graphics tier never affects gameplay: the same collision, visibility (foliage the same in both tiers) and hitboxes, so a Performance-mode player isn't advantaged or handicapped. |
+| Dev PC | Building the game needs a stronger PC than playing it: about RTX 2070-class, 32 GB RAM, 150 GB free SSD. |
 
 ### 10.2 Multiplayer and online
 
@@ -317,7 +323,7 @@ Wildcard rules don't change hero power.
 | Input | Enhanced Input |
 | AI | Behavior Trees + EQS for bots, a C++ Squad Commander |
 | UI | UMG |
-| World | World Partition, Lumen, Nanite; Quixel Megascans and Fab assets; PCG for forest scattering |
+| World | World Partition; Lumen in Epic mode only; stylized meshes with standard LODs (no Nanite-only assets, so they render on DX11); PCG for forest scattering |
 
 ### 10.4 Choppable trees
 
@@ -346,7 +352,7 @@ Each module talks to the others through clear interfaces (e.g. the commander rea
 ### 10.6 Source control
 
 - **Git with Git LFS** for binary assets (`.uasset`, `.umap`), using Unreal's recommended `.gitignore` (no `Saved/`, `Intermediate/`, `Binaries/` or `DerivedDataCache/`).
-- **Storage limit:** GitHub's free LFS storage is limited, so large art packs (Megascans) are kept out of git and re-downloaded via Fab. If LFS outgrows GitHub, switch to Perforce or a paid LFS host.
+- **Storage limit:** GitHub's free LFS storage is limited, so large third-party art packs are kept out of git and re-downloaded from their source. If LFS outgrows GitHub, switch to Perforce or a paid LFS host.
 
 ---
 
@@ -395,7 +401,7 @@ This way, balancing after a playtest is a value edit, not code work.
 | M1 | Greybox slice | One untextured patch of Pine Harbor with your HQ, 1 sub-base and the enemy HQ. Ranger is fully playable (GAS). Capture, tickets and the charge win condition all work. 2 players on a listen server against 3 basic bots. |
 | M2 | Core co-op | All 5 heroes. Building (all §4.2 structures), chopping and crates. Full Pine Harbor greybox with 5 sub-bases and their unlocks. The boat. The Squad Commander AI with 5 bots. Hometown Heroes. 5 players. |
 | M3 | Squad features | EOS lobbies, invites and voice. Votes. Wildcard rules. Base styles. Homestead and Bragging Rights. |
-| M4 | Art and audio pass | Megascans forest, lighting, character models and animation, VFX, sound, Hometown Hero voice barks. Hit the performance target. |
+| M4 | Art and audio pass | Stylized forest, lighting for both graphics tiers, character models and animation, VFX, sound, Hometown Hero voice barks. Hit both performance targets (§10.1) on real min-spec and recommended PCs. |
 | Later | Expansion | 5v5 PvP, Longview with the train, ETR Airport with the plane, battle royale, more heroes, cloud saves, a Steam release |
 
 The first implementation plan covers **M0 and M1 only**. Each later milestone gets its own plan.
@@ -405,7 +411,7 @@ The first implementation plan covers **M0 and M1 only**. Each later milestone ge
 ## 14. Open questions
 
 - [ ] **Lumberjack:** keep the Scattergun plus melee weapons (assumed here), or go all-melee?
-- [ ] **Hardware:** does every squad member have a PC that hits the RTX 2070-class target?
+- [ ] **Hardware:** whose PC is the weakest in the squad? It becomes our min-spec test machine. Who has a dev PC strong enough to build on?
 - [ ] **Run length:** is 60–90 minutes right, or do we want a shorter mode?
 - [ ] **Final name:** keep "Piney Woods: Timber Wars"?
 

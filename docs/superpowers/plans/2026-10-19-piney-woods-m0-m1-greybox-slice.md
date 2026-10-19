@@ -18,6 +18,7 @@
 - Unreal Automation tests
 - Git with Git LFS
 - Unreal MCP plugin (ModelContextProtocol + AllToolsets), so Claude Code can drive the editor
+- Two graphics tiers via Unreal scalability: Performance (DX11, no Lumen) and Epic (DX12, Lumen)
 
 **Spec:** `docs/superpowers/specs/2026-10-19-piney-woods-design.md` (sections 2, 3, 10, 11, 12 and 13 are the ones this plan implements)
 
@@ -46,6 +47,12 @@
 | Ranger | HP 200; speed 760 cm/s; rifle 19 dmg, 7 shots/s, mag 30, reload 1.6 s, spread 0.014 rad, range 13000 cm, headshot ×1.5 |
 | Ranger abilities | Dash: 3000 cm/s for 0.22 s, 5 s cooldown. Frag: 85 dmg, radius 600 cm, fuse 1.7 s, 9 s cooldown, damage falloff `1 − 0.65·d/r`. Hog Wild: 7 s, 2× fire rate, no ammo use, +20% speed. |
 | Ultimate charge | +0.22 per damage dealt to enemies, +0.7 per second passive, capped at 100. No charge for self-damage or friendly damage. |
+
+**Graphics tiers** (spec §10.1)
+- Performance mode must run on DX11 with Lumen off. Epic mode uses DX12 with Lumen GI and reflections.
+- No Nanite-only meshes: every mesh keeps standard LODs so it renders on DX11.
+- Graphics tier never changes collision, visibility or hitboxes. Foliage that blocks sight in one tier blocks it in both.
+- Greybox target on the squad's weakest PC: 30+ fps at 1080p output in Performance mode.
 
 **Networking**
 - Server-authoritative. Clients send input and requests; the server runs every rule.
@@ -141,6 +148,11 @@ All paths are relative to `PineyWoods/Source/PineyWoods/`. Each file has one job
 - [ ] **Step 3: Enable plugins and dependencies.**
   - In `PineyWoods.uproject`, enable `GameplayAbilities`, `ModelContextProtocol` and `AllToolsets`. EnhancedInput is already on in the template.
   - In `PineyWoods.Build.cs`, set `PublicDependencyModuleNames` to `Core, CoreUObject, Engine, InputCore, EnhancedInput, GameplayAbilities, GameplayTags, GameplayTasks, AIModule, NavigationSystem, UMG, Slate, SlateCore, NetCore`.
+- [ ] **Step 3b: Set up the two graphics tiers.**
+  - In `Config/DefaultEngine.ini`, set the Windows default RHI to DX12 with DX11 allowed as a fallback (`-dx11` launch flag), and target both SM5 and SM6 shader formats.
+  - In `Config/DefaultScalability.ini`, make GI and reflection quality levels 0–1 (Low/Medium) use no Lumen (`r.DynamicGlobalIlluminationMethod=0`, `r.ReflectionMethod=2`), and levels 2–3 (High/Epic) use Lumen (`=1`, `=1`). Set low-tier shadows to non-virtual and turn on TSR upscaling with a resolution scale of 67 at Low.
+  - Keep `r.Nanite.ProjectEnabled` on, but import no Nanite-only meshes (Global Constraints).
+  - Verify: launch the editor with `-dx11`, set Engine Scalability to Low, and confirm the template map renders with no errors and `stat gpu` shows no Lumen passes. Switch to Epic (DX12) and confirm Lumen passes appear.
 - [ ] **Step 4: Connect the editor to Claude Code.**
   - Add the MCP auto-start block to `PineyWoods/Saved/Config/WindowsEditor/EditorPerProjectUserSettings.ini`: `[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]` with `bAutoStartServer=True`.
   - Write `PineyWoods/.mcp.json` pointing `unreal-mcp` at `http://127.0.0.1:8000/mcp`.
@@ -151,7 +163,7 @@ All paths are relative to `PineyWoods/Source/PineyWoods/`. Each file has one job
 
 ```bash
 git add .gitattributes PineyWoods
-git commit -m "chore: create PineyWoods UE5 project with GAS, MCP and smoke test"
+git commit -m "chore: create PineyWoods UE5 project with GAS, MCP, graphics tiers and smoke test"
 ```
 
 ---
@@ -639,6 +651,10 @@ git commit -m "feat: add greybox HUD"
 - [ ] **Step 3: Packaged-build check.**
   - Package Win64 Development and run 2 copies on 2 PCs. The host uses `open L_PineHarbor_Greybox?listen`, and the client uses `open <host-ip>`. Note: Steam/EOS invites are M3, so direct IP for now.
   - **Expected:** a full run from fortify to a detonation win.
+- [ ] **Step 3b: Min-spec check.**
+  - On the squad's weakest PC, run the packaged build with `-dx11` at Low scalability (Performance mode), at 1080p output.
+  - Play a full run with 3 bots and watch `stat fps` and `stat unit`.
+  - **Expected:** 30+ fps average, no drop below 20 fps during grenade explosions or 5-player fights. If it misses, record the `stat unit` numbers (Game, Draw, GPU) in the playtest doc.
 - [ ] **Step 4: Squad playtest.**
   - Play at least 2 full runs with as many of the 5 as can join, against the 3 bots.
   - Record answers to:
